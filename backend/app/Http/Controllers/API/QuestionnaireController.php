@@ -11,6 +11,7 @@ use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class QuestionnaireController extends Controller
 {
@@ -136,7 +137,7 @@ class QuestionnaireController extends Controller
             'sections.*.items.*.weight_percent' => ['nullable', 'numeric', 'min:0'],
         ];
 
-        return $request->validate($rules);
+        return Validator::validate($request->all(), $rules);
     }
 
     private function syncSectionsAndItems(QuestionnaireVersion $version, array $sections): void
