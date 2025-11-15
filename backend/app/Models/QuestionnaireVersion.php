@@ -2,40 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Support\Collection;
+use App\Support\Database;
 
 class QuestionnaireVersion extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'questionnaire_id',
-        'version_number',
-        'status',
-        'valid_from',
-        'valid_to',
-    ];
-
-    protected $casts = [
-        'valid_from' => 'date',
-        'valid_to' => 'date',
-    ];
-
-    public function questionnaire(): BelongsTo
+    protected static function table(): string
     {
-        return $this->belongsTo(Questionnaire::class);
+        return 'questionnaire_versions';
     }
 
-    public function sections(): HasMany
+    public function sections(): Collection
     {
-        return $this->hasMany(QuestionnaireSection::class)->orderBy('order_index');
+        $rows = Database::where('questionnaire_sections', fn ($row) => $row['questionnaire_version_id'] === $this->id);
+
+        return new Collection(array_map(fn ($row) => new QuestionnaireSection($row), $rows));
     }
 
-    public function items(): HasMany
+    public function items(): Collection
     {
-        return $this->hasMany(QuestionnaireItem::class)->orderBy('order_index');
+        $rows = Database::where('questionnaire_items', fn ($row) => $row['questionnaire_version_id'] === $this->id);
+
+        return new Collection(array_map(fn ($row) => new QuestionnaireItem($row), $rows));
     }
 }

@@ -2,51 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use App\Auth\TokenRepository;
+use App\Support\Hash;
 
-class User extends Authenticatable
+class User extends Model
 {
-    use HasApiTokens;
-    use HasFactory;
-    use Notifiable;
-
-    protected $fillable = [
-        'tenant_id',
-        'name',
-        'email',
-        'password',
-        'role',
-        'is_active',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'is_active' => 'boolean',
-    ];
-
-    public function tenant(): BelongsTo
+    protected static function table(): string
     {
-        return $this->belongsTo(Tenant::class);
+        return 'users';
     }
 
-    public function workFunctions(): BelongsToMany
+    public function verifyPassword(string $password): bool
     {
-        return $this->belongsToMany(WorkFunction::class, 'user_work_function');
+        return Hash::check($password, $this->password);
     }
 
-    public function assessments(): HasMany
+    public function createToken(string $name): object
     {
-        return $this->hasMany(Assessment::class);
+        $plainTextToken = TokenRepository::issue($this->id);
+
+        return (object) ['plainTextToken' => $plainTextToken];
     }
 }

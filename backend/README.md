@@ -1,40 +1,17 @@
-# HRassess v4 Backend
+# HRassess Backend (Offline Edition)
 
-## Prerequisites
-- PHP 8.1+
-- Composer
-- MySQL or MariaDB instance
+This backend is a lightweight PHP application that runs entirely in this repository without any external Composer dependencies. It uses an in-memory database and a custom test harness so it works even when no package mirrors are available.
 
-## Installation
-1. Install dependencies:
-   ```bash
-   composer install
-   ```
-2. Copy the example environment and update values:
-   ```bash
-   cp .env.example .env
-   ```
-3. Generate application key:
-   ```bash
-   php artisan key:generate
-   ```
-4. Configure database credentials in `.env`.
+## Structure
+- `app/` – source code for the in-memory API.
+- `tests/` – feature tests that exercise the API through the custom request runner.
+- `vendor/` – local autoloader and lightweight phpunit runner script.
 
-## Database Migrations
-Run the migrations:
-```bash
-php artisan migrate
+## Running the tests
+Use the bundled runner:
+
+```
+php vendor/bin/phpunit
 ```
 
-## Running the Development Server
-Start the API server:
-```bash
-php artisan serve
-```
-The API will be available at `http://localhost:8000/api/v1`.
-
-## Testing
-Run the PHPUnit test suite:
-```bash
-php artisan test
-```
+The command reports each test case and exits with a non-zero code if any assertion fails.

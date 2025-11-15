@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Assessment;
 use App\Models\Questionnaire;
 use App\Models\QuestionnaireItem;
 use App\Models\QuestionnaireSection;
@@ -10,20 +9,18 @@ use App\Models\QuestionnaireVersion;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Models\WorkFunction;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
+use App\Support\Hash;
 use Tests\TestCase;
 
 class AssessmentFlowTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testStaffUserCompletesAssessment(): void
     {
         $tenant = Tenant::create([
             'name' => 'Demo Tenant',
             'slug' => 'demo',
             'primary_contact_email' => 'contact@example.com',
+            'is_active' => true,
         ]);
 
         $user = User::create([
@@ -44,8 +41,6 @@ class AssessmentFlowTest extends TestCase
         $questionnaire = Questionnaire::create([
             'tenant_id' => $tenant->id,
             'name' => 'Baseline Survey',
-            'description' => null,
-            'is_active' => true,
         ]);
 
         $version = QuestionnaireVersion::create([
