@@ -63,3 +63,72 @@ textarea {
   color: #b91c1c;
   margin-top: 0.5rem;
 }
+
+.success {
+  color: #047857;
+  margin-top: 0.5rem;
+}
+
+.wizard-steps {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.wizard-step {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background-color: #e5e7eb;
+  text-align: center;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.wizard-step.active {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checklist li {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.checklist li.pass {
+  border-color: #16a34a;
+  background-color: #ecfdf5;
+}
+
+.checklist li.fail {
+  border-color: #f87171;
+  background-color: #fef2f2;
+}
+
+.checklist .indicator {
+  font-size: 1.25rem;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+.checklist .details {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.wizard-form h3 {
+  margin-top: 1.5rem;
+}
