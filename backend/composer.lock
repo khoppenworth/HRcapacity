@@ -1,9 +1,5 @@
 {
-    "_readme": [
-        "This lock file was added in the kata environment without access to Composer mirrors.",
-        "Run \"composer update\" in a networked environment to refresh package metadata if required."
-    ],
-    "content-hash": "",
+    "content-hash": "offline",
     "packages": [],
     "packages-dev": [],
     "aliases": [],
@@ -11,7 +7,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "platform": {
+        "php": "^8.1"
+    },
+    "platform-dev": []
 }
