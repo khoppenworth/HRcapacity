@@ -7,6 +7,7 @@ use App\Models\Tenant;
 use App\Models\WorkFunction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class WorkFunctionController extends Controller
@@ -26,7 +27,7 @@ class WorkFunctionController extends Controller
         /** @var Tenant $tenant */
         $tenant = app(Tenant::class);
 
-        $data = $request->validate([
+        $data = Validator::validate($request->all(), [
             'code' => ['required', 'string', 'max:20', Rule::unique('work_functions')->where('tenant_id', $tenant->id)],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -56,7 +57,7 @@ class WorkFunctionController extends Controller
         /** @var Tenant $tenant */
         $tenant = app(Tenant::class);
 
-        $data = $request->validate([
+        $data = Validator::validate($request->all(), [
             'code' => ['sometimes', 'string', 'max:20', Rule::unique('work_functions')->where('tenant_id', $tenant->id)->ignore($workFunction->id)],
             'name' => ['sometimes', 'string', 'max:255'],
             'description' => ['nullable', 'string'],

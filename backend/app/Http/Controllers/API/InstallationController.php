@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class InstallationController extends Controller
 {
@@ -39,7 +40,8 @@ class InstallationController extends Controller
             ], 409);
         }
 
-        $data = $request->validate(
+        $data = Validator::validate(
+            $request->all(),
             InstallRequest::rulesDefinition(),
             [],
             InstallRequest::attributesDefinition()

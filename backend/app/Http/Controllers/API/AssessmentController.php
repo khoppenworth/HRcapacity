@@ -13,7 +13,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class AssessmentController extends Controller
 {
@@ -42,7 +41,7 @@ class AssessmentController extends Controller
         $tenant = app(Tenant::class);
         $user = $request->user();
 
-        $data = $request->validate([
+        $data = Validator::validate($request->all(), [
             'work_function_id' => ['required', 'integer'],
             'questionnaire_version_id' => ['required', 'integer'],
             'performance_period' => ['required', 'string', 'max:50'],
@@ -115,7 +114,7 @@ class AssessmentController extends Controller
 
     private function validateResponses(Request $request): array
     {
-        return $request->validate([
+        return Validator::validate($request->all(), [
             'responses' => ['required', 'array'],
             'responses.*.questionnaire_item_id' => ['required', 'integer'],
             'responses.*.raw_value' => ['nullable', 'string'],
