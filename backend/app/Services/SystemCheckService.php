@@ -16,10 +16,28 @@ class SystemCheckService
             $this->checkExtension('openssl'),
             $this->checkExtension('pdo_mysql'),
             $this->checkExtension('mbstring'),
+            $this->checkProjectDirectoryIsWritable(),
             $this->checkStorageDirectoryIsWritable('app'),
             $this->checkStorageDirectoryIsWritable('logs'),
             $this->checkDatabaseConnection(),
             $this->checkAppKey(),
+        ];
+    }
+
+    private function checkProjectDirectoryIsWritable(): array
+    {
+        $path = base_path();
+        $writable = is_writable($path);
+
+        return [
+            'name' => 'Writable: project directory',
+            'passed' => $writable,
+            'details' => $writable
+                ? 'Project root is writable for the current user.'
+                : sprintf(
+                    'Adjust ownership or permissions so the deployment user can write to %s (required for composer.lock updates).',
+                    $path
+                ),
         ];
     }
 

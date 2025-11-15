@@ -112,8 +112,13 @@ cd HRcapacity
 1. Install PHP dependencies:
    ```bash
    cd backend
+   # Ensure the current user can write to the project directory so composer.lock can be created
+   sudo chown -R "$USER":"$USER" .
    composer install --no-dev --optimize-autoloader
    ```
+   If you deploy with a dedicated service account (for example `www-data`), adjust the ownership command accordingly or run
+   `composer` as that user. Composer needs write access to `backend/composer.lock`; without it you will see an error similar to
+   `file_put_contents(./composer.lock): Failed to open stream: Permission denied` from `JsonFile.php`.
 2. Copy the environment template and adjust settings:
    ```bash
    cp .env.example .env
