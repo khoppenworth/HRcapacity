@@ -13,7 +13,13 @@ if (! file_exists($autoloadPath)) {
 
 require $autoloadPath;
 
-$app = require __DIR__ . '/bootstrap/app.php';
+$bootstrapPath = __DIR__ . '/bootstrap/app.php';
+
+if (! file_exists($bootstrapPath)) {
+    exit(handleWithoutLaravel($argv));
+}
+
+$app = require $bootstrapPath;
 
 $kernel = $app->make(Kernel::class);
 

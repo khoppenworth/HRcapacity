@@ -1,4 +1,3 @@
-/backend/vendor/
 /backend/storage/
 /backend/.env
 /backend/.env.local
