@@ -8,6 +8,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Services\SystemCheckService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -30,7 +31,7 @@ class InstallationController extends Controller
         ]);
     }
 
-    public function install(InstallRequest $request): JsonResponse
+    public function install(Request $request): JsonResponse
     {
         if (Tenant::exists() || User::exists()) {
             return new JsonResponse([
@@ -38,7 +39,11 @@ class InstallationController extends Controller
             ], 409);
         }
 
-        $data = $request->validated();
+        $data = $request->validate(
+            InstallRequest::rulesDefinition(),
+            [],
+            InstallRequest::attributesDefinition()
+        );
 
         $result = DB::transaction(function () use ($data) {
             $tenant = Tenant::create([

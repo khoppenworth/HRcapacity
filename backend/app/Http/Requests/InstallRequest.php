@@ -14,6 +14,14 @@ class InstallRequest extends FormRequest
 
     public function rules(): array
     {
+        return self::rulesDefinition();
+    }
+
+    /**
+     * Provide the reusable validation rules for installation requests.
+     */
+    public static function rulesDefinition(): array
+    {
         return [
             'company_name' => ['required', 'string', 'max:255'],
             'company_slug' => ['required', 'alpha_dash', 'max:50', Rule::unique('tenants', 'slug')],
@@ -25,6 +33,14 @@ class InstallRequest extends FormRequest
     }
 
     public function attributes(): array
+    {
+        return self::attributesDefinition();
+    }
+
+    /**
+     * Provide the reusable attribute labels for validation messages.
+     */
+    public static function attributesDefinition(): array
     {
         return [
             'company_name' => 'company name',
