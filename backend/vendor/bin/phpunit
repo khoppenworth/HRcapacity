@@ -1,0 +1,67 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$vendorDir = __DIR__ . '/..';
+$projectRoot = realpath($vendorDir . '/..');
+
+require $vendorDir . '/autoload.php';
+
+$testsPath = $projectRoot . '/tests';
+if (! is_dir($testsPath)) {
+    fwrite(STDERR, "Tests directory not found.\n");
+    exit(1);
+}
+
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($testsPath, FilesystemIterator::SKIP_DOTS)
+);
+
+$testClasses = [];
+$prefixLength = strlen($testsPath) + 1;
+
+foreach ($iterator as $file) {
+    if ($file->getExtension() !== 'php') {
+        continue;
+    }
+
+    require_once $file->getPathname();
+
+    $relative = substr($file->getPathname(), $prefixLength, -4);
+    $relative = str_replace(DIRECTORY_SEPARATOR, '/', $relative);
+    $class = 'Tests\\' . str_replace('/', '\\', $relative);
+
+    if (class_exists($class) && is_subclass_of($class, Tests\TestCase::class)) {
+        $testClasses[] = $class;
+    }
+}
+
+sort($testClasses);
+
+$total = 0;
+$failed = 0;
+$output = '';
+
+foreach ($testClasses as $class) {
+    $testCase = new $class();
+    $results = $testCase->run();
+
+    foreach ($results as $result) {
+        ++$total;
+        $method = sprintf('%s::%s', $class, $result['method']);
+
+        if ($result['status'] === 'passed') {
+            $output .= sprintf("PASS %s\n", $method);
+            continue;
+        }
+
+        ++$failed;
+        $output .= sprintf("FAIL %s - %s\n", $method, $result['message']);
+    }
+}
+
+echo $output;
+echo sprintf("\nExecuted %d tests: %d passed, %d failed.\n", $total, $total - $failed, $failed);
+
+exit($failed > 0 ? 1 : 0);
