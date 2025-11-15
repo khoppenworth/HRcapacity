@@ -29,6 +29,10 @@ return [
         Illuminate\Routing\RoutingServiceProvider::class,
         Illuminate\Database\DatabaseServiceProvider::class,
         Illuminate\Events\EventServiceProvider::class,
+        Illuminate\Translation\TranslationServiceProvider::class,
+        Illuminate\Validation\ValidationServiceProvider::class,
+        Illuminate\Hashing\HashServiceProvider::class,
+        Illuminate\Encryption\EncryptionServiceProvider::class,
         Laravel\Sanctum\SanctumServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
@@ -47,5 +51,6 @@ return [
         'Hash' => Illuminate\Support\Facades\Hash::class,
         'Log' => Illuminate\Support\Facades\Log::class,
         'Route' => Illuminate\Support\Facades\Route::class,
+        'Validator' => Illuminate\Support\Facades\Validator::class,
     ],
 ];

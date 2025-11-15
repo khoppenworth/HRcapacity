@@ -70,6 +70,11 @@ const AssessmentFormPage = () => {
         responses: payloadResponses
       });
       setAssessment(response.data);
+      const serverResponses: ResponseState = {};
+      response.data.responses?.forEach((resp) => {
+        serverResponses[resp.questionnaire_item_id] = resp;
+      });
+      setResponses(serverResponses);
       setSuccess(endpoint === 'submit' ? 'Assessment submitted successfully.' : 'Draft saved.');
     } catch (err: any) {
       setError(err.response?.data?.message ?? 'Failed to save assessment.');
@@ -124,7 +129,6 @@ const AssessmentFormPage = () => {
     }
 
     if (item.type === 'boolean') {
-      const value = response?.raw_value === '1';
       return (
         <select
           value={response?.raw_value ?? ''}
