@@ -9,13 +9,95 @@ HRcapacity is a full-stack application composed of a Laravel API backend and a R
 
 ## Deployment guide
 
-### 1. Prerequisites
+### 1. Prerequisites (optimized for Ubuntu 24.04 LTS)
 
-- PHP 8.1 or newer with extensions required by Laravel (`bcmath`, `ctype`, `fileinfo`, `json`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`).
-- Composer.
-- Node.js 18+ and npm (for building the frontend).
-- MySQL 8+ (or MariaDB 10.6+) database server.
-- Web server capable of serving PHP applications (e.g., Nginx or Apache) and static assets.
+#### 1.1 Minimum server specification
+
+- Ubuntu Server 24.04 LTS (fresh install or hardened base image).
+- 2 vCPU, 4 GB RAM, and 40 GB storage (adjust for production load and database growth).
+- SSH access with sudo privileges.
+
+#### 1.2 System packages
+
+Update the package index and install core tooling:
+
+```bash
+sudo apt update
+sudo apt install -y git unzip curl software-properties-common ufw
+```
+
+#### 1.3 PHP runtime (8.3 on Ubuntu 24.04)
+
+Ubuntu 24.04 ships PHP 8.3 packages. Install PHP-FPM with the extensions Laravel requires:
+
+```bash
+sudo apt install -y \
+  php8.3-fpm php8.3-cli php8.3-bcmath php8.3-ctype php8.3-fileinfo \
+  php8.3-json php8.3-mbstring php8.3-mysql php8.3-opcache php8.3-readline \
+  php8.3-xml php8.3-zip
+```
+
+Enable and start the PHP-FPM service:
+
+```bash
+sudo systemctl enable --now php8.3-fpm
+```
+
+#### 1.4 Composer
+
+Install Composer globally if it is not already present:
+
+```bash
+cd /tmp
+curl -sS https://getcomposer.org/installer -o composer-setup.php
+sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+```
+
+#### 1.5 Node.js toolchain
+
+Laravel Mix/Vite builds benefit from Node.js 20, which is available from NodeSource for Ubuntu 24.04:
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+Verify versions:
+
+```bash
+php -v   # should report 8.3.x
+composer --version
+node -v  # should report v20.x
+npm -v
+```
+
+#### 1.6 Database server
+
+- Install MySQL 8.0 (default on 24.04) or MariaDB 10.11+: `sudo apt install -y mysql-server`.
+- Run `sudo mysql_secure_installation` to harden the instance.
+- Create a dedicated database and user for HRcapacity:
+  ```sql
+  CREATE DATABASE hrcapacity CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  CREATE USER 'hrcapacity'@'%' IDENTIFIED BY 'strong-password';
+  GRANT ALL PRIVILEGES ON hrcapacity.* TO 'hrcapacity'@'%';
+  FLUSH PRIVILEGES;
+  ```
+
+#### 1.7 Web server and SSL
+
+- Install Nginx (recommended) or Apache: `sudo apt install -y nginx`.
+- Configure `ufw` to allow HTTP/HTTPS (optional):
+  ```bash
+  sudo ufw allow OpenSSH
+  sudo ufw allow 'Nginx Full'
+  sudo ufw enable
+  ```
+- Obtain TLS certificates via Let’s Encrypt (e.g., `sudo snap install --classic certbot`).
+
+#### 1.8 Optional services
+
+- Redis for queues/cache: `sudo apt install -y redis-server` (ensure persistence requirements are met).
+- Supervisor or systemd units for long-running queue workers.
 
 ### 2. Clone the repository
 
