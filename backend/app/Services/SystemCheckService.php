@@ -25,7 +25,7 @@ class SystemCheckService
 
     private function checkPhpVersion(): array
     {
-        $minimum = '8.2.0';
+        $minimum = '8.1.0';
         $current = PHP_VERSION;
 
         return [

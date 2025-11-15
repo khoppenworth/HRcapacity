@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { getAuth, setAuth } from './api/client';
 import { InstallationStatus, fetchInstallationStatus } from './api/install';
@@ -23,37 +23,40 @@ function App() {
   const location = useLocation();
   const [auth, setAuthState] = useState(getAuth());
   const [installationStatus, setInstallationStatus] = useState<InstallationStatus | null>(null);
+  const installationStatusRef = useRef<InstallationStatus | null>(installationStatus);
   const [loadingInstallStatus, setLoadingInstallStatus] = useState(true);
   const [installError, setInstallError] = useState<string | null>(null);
 
-  const refreshInstallationStatus = useCallback(
-    async (options?: { showLoading?: boolean }) => {
-      const shouldShowLoading = options?.showLoading ?? installationStatus === null;
+  useEffect(() => {
+    installationStatusRef.current = installationStatus;
+  }, [installationStatus]);
 
+  const refreshInstallationStatus = useCallback(async (options?: { showLoading?: boolean }) => {
+    const shouldShowLoading = options?.showLoading ?? installationStatusRef.current === null;
+
+    if (shouldShowLoading) {
+      setLoadingInstallStatus(true);
+    }
+
+    try {
+      const status = await fetchInstallationStatus();
+      installationStatusRef.current = status;
+      setInstallationStatus(status);
+      setInstallError(null);
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ??
+        'Unable to load installation status. Confirm the API service is reachable.';
+      setInstallError(message);
+      if (!installationStatusRef.current) {
+        setInstallationStatus(null);
+      }
+    } finally {
       if (shouldShowLoading) {
-        setLoadingInstallStatus(true);
+        setLoadingInstallStatus(false);
       }
-
-      try {
-        const status = await fetchInstallationStatus();
-        setInstallationStatus(status);
-        setInstallError(null);
-      } catch (error: any) {
-        const message =
-          error?.response?.data?.message ??
-          'Unable to load installation status. Confirm the API service is reachable.';
-        setInstallError(message);
-        if (!installationStatus) {
-          setInstallationStatus(null);
-        }
-      } finally {
-        if (shouldShowLoading) {
-          setLoadingInstallStatus(false);
-        }
-      }
-    },
-    [installationStatus]
-  );
+    }
+  }, []);
 
   useEffect(() => {
     setAuthState(getAuth());

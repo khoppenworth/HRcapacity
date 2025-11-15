@@ -19,8 +19,16 @@ class InstallationController extends Controller
 
     public function status(): JsonResponse
     {
-        $tenants = Tenant::count();
-        $admins = User::where('role', 'tenant_admin')->count();
+        $tenants = 0;
+        $admins = 0;
+
+        try {
+            $tenants = Tenant::count();
+            $admins = User::where('role', 'tenant_admin')->count();
+        } catch (\Throwable $exception) {
+            // Leave counts at zero when the database is unreachable so the readiness
+            // checklist can still surface the failure via the system checks.
+        }
 
         return new JsonResponse([
             'isConfigured' => $tenants > 0 && $admins > 0,
