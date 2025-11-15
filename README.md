@@ -168,13 +168,27 @@ cd HRcapacity
    - **Via Nginx/Apache:** configure a virtual host that points to the `frontend/dist` directory.
    - **Via CDN or object storage:** upload the contents of `dist/` and configure caching/SSL as appropriate.
 
-### 5. Connect frontend and backend
+### 5. Run the installation wizard
+
+After deploying both services, browse to the frontend domain. The application automatically redirects to `/install` until the
+initial setup completes.
+
+1. Review the environment checklist. All items must display green before you can continue. Use the **Re-run checks** button to
+   verify fixes after updating server configuration (for example, enabling required PHP extensions).
+2. Provide tenant details (company name and slug) plus the primary administrator credentials. The slug becomes part of tenant-
+   specific URLs, so choose a concise identifier.
+3. Submit the form to provision the first tenant and administrator account. On success, the wizard confirms completion and
+   redirects future visits to the sign-in page.
+
+After the wizard finishes, you can access the application at `/login` using the administrator account you just created.
+
+### 6. Connect frontend and backend
 
 - Confirm the frontend's `VITE_API_URL` matches the public URL of the backend API (e.g., `https://api.example.com/api/v1`).
 - Ensure CORS is configured on the backend (`config/cors.php`) to allow requests from the frontend domain.
 - If using HTTPS, make sure both the API and frontend are served over TLS and that the `.env` values (such as `APP_URL`) use `https://`.
 
-### 6. Background workers & scheduling (optional)
+### 7. Background workers & scheduling (optional)
 
 If your deployment uses queues, jobs, or scheduled tasks, configure the following after deployment:
 
@@ -184,13 +198,13 @@ If your deployment uses queues, jobs, or scheduled tasks, configure the followin
   * * * * * www-data php /var/www/HRcapacity/backend/artisan schedule:run >> /dev/null 2>&1
   ```
 
-### 7. Health checks and monitoring
+### 8. Health checks and monitoring
 
 - Configure health endpoints (e.g., `GET /api/v1/health`) in your load balancer.
 - Monitor log files in `storage/logs/laravel.log` and set up centralized logging/alerting.
 - Keep track of application metrics such as response times, queue lengths, and database performance.
 
-### 8. Ongoing maintenance
+### 9. Ongoing maintenance
 
 - Pull updates and re-run migrations as needed:
   ```bash
