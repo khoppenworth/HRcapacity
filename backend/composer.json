@@ -15,6 +15,6 @@
         }
     },
     "scripts": {
-        "test": "php vendor/bin/phpunit"
+        "test": "php tests/run.php"
     }
 }
