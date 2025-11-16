@@ -54,6 +54,10 @@ function handleWithoutLaravel(array $argv): int
         return generateApplicationKey($argv);
     }
 
+    if ($command === 'migrate') {
+        return runOfflineMigrations($argv);
+    }
+
     fwrite(STDERR, "Composer dependencies are not installed. Unsupported command.\n");
 
     return 1;
@@ -132,6 +136,27 @@ function generateApplicationKey(array $options): int
     }
 
     fwrite(STDOUT, "Application key set successfully.\n");
+
+    return 0;
+}
+
+function runOfflineMigrations(array $options): int
+{
+    $unsupported = array_filter($options, static function ($option): bool {
+        if ($option === '--') {
+            return false;
+        }
+
+        return ! str_starts_with($option, '--');
+    });
+
+    if (! empty($unsupported)) {
+        fwrite(STDERR, 'Composer dependencies are not installed. Unsupported migrate arguments: ' . implode(', ', $unsupported) . "\n");
+
+        return 1;
+    }
+
+    fwrite(STDOUT, "Offline database is already migrated. No actions were required.\n");
 
     return 0;
 }
