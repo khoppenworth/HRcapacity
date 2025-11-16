@@ -116,9 +116,17 @@ cd HRcapacity
    sudo chown -R "$USER":"$USER" .
    composer install --no-dev --optimize-autoloader
    ```
+   This step is **required** even if the repository already contains a `vendor/` directory from a local development setup.
+   The `composer install` command downloads every package listed in `composer.lock` and rebuilds the optimized autoloader so
+   Laravel can locate controllers, service providers, and framework files at runtime.
+
    If you deploy with a dedicated service account (for example `www-data`), adjust the ownership command accordingly or run
    `composer` as that user. Composer needs write access to `backend/composer.lock`; without it you will see an error similar to
    `file_put_contents(./composer.lock): Failed to open stream: Permission denied` from `JsonFile.php`.
+
+   **Tip:** run `composer check-platform-reqs` after installation to confirm the PHP extensions on the server satisfy the
+   packages' requirements. Missing extensions or skipped downloads manifest as "Class not found" or "file or directory does
+   not exist" errors when Laravel boots.
 2. Copy the environment template and adjust settings:
    ```bash
    cp .env.example .env
@@ -202,6 +210,28 @@ If your deployment uses queues, jobs, or scheduled tasks, configure the followin
   ```cron
   * * * * * www-data php /var/www/HRcapacity/backend/artisan schedule:run >> /dev/null 2>&1
   ```
+
+### Appendix A – Composer troubleshooting
+
+If you encounter errors about missing classes, service providers, or vendor packages during deployment, double-check the
+following:
+
+1. **Fresh install** – Delete any partially-synced vendor directory before running Composer: `rm -rf vendor && composer install`.
+   This ensures the autoloader only references files that actually exist on the server.
+2. **PHP memory limits** – Large dependency graphs can hit the default 128 MB CLI memory limit. Export
+   `COMPOSER_MEMORY_LIMIT=-1` temporarily when running `composer install` or add `memory_limit = 512M` to
+   `/etc/php/8.3/cli/php.ini`.
+3. **Network mirrors** – If `composer install` fails while downloading archives, configure the `COMPOSER_ALLOW_SUPERUSER=1`
+   environment variable (when running as root) and re-run with `composer install --prefer-dist --no-interaction`. You can also
+   set up [Composer cache mirrors](https://getcomposer.org/doc/articles/troubleshooting.md#http-basic-authentication-required)
+   if your servers must route through a proxy.
+4. **File permissions** – Confirm the web server user can read the `vendor/` directory and Laravel storage paths:
+   `sudo chown -R www-data:www-data vendor storage bootstrap/cache`.
+5. **Sanity check** – Execute `php artisan about` after deployment. If it fails, rerun `composer dump-autoload -o` to rebuild the
+   class map and resolve stale paths.
+
+These steps cover the most common scenarios that lead to "file or folder not found" errors when Composer dependencies are not
+fully installed.
 
 ### 8. Health checks and monitoring
 
