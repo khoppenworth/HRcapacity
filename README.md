@@ -124,6 +124,15 @@ cd HRcapacity
    `composer` as that user. Composer needs write access to `backend/composer.lock`; without it you will see an error similar to
    `file_put_contents(./composer.lock): Failed to open stream: Permission denied` from `JsonFile.php`.
 
+   When working as a different user than the repository owner, Git may refuse to run with the error `fatal: detected dubious
+   ownership in repository at '/var/www/HRcapacity'`. Resolve it by either taking ownership of the project directory or adding
+   it to Git's safe directory list:
+
+   ```bash
+   sudo chown -R <deploy-user>:<deploy-user> /var/www/HRcapacity
+   sudo -u <deploy-user> git config --global --add safe.directory /var/www/HRcapacity
+   ```
+
    **Tip:** run `composer check-platform-reqs` after installation to confirm the PHP extensions on the server satisfy the
    packages' requirements. Missing extensions or skipped downloads manifest as "Class not found" or "file or directory does
    not exist" errors when Laravel boots.

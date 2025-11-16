@@ -30,6 +30,11 @@ foreach ($iterator as $file) {
 
     $relative = substr($file->getPathname(), $prefixLength, -4);
     $relative = str_replace(DIRECTORY_SEPARATOR, '/', $relative);
+
+    if (str_starts_with($relative, 'framework/')) {
+        continue;
+    }
+
     $class = 'Tests\\' . str_replace('/', '\\', $relative);
 
     if (class_exists($class) && is_subclass_of($class, Tests\TestCase::class)) {
