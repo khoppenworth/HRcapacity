@@ -11,7 +11,8 @@
         "ext-openssl": "*",
         "ext-pdo_mysql": "*",
         "ext-xml": "*",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "laravel/framework": "^11.0"
     },
     "autoload": {
         "files": [
