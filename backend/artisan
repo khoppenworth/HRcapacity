@@ -142,13 +142,30 @@ function generateApplicationKey(array $options): int
 
 function runOfflineMigrations(array $options): int
 {
-    $unsupported = array_filter($options, static function ($option): bool {
+    $unsupported = [];
+    $previousWasOption = false;
+
+    foreach ($options as $option) {
         if ($option === '--') {
-            return false;
+            $previousWasOption = false;
+
+            continue;
         }
 
-        return ! str_starts_with($option, '--');
-    });
+        if (! str_starts_with($option, '-')) {
+            if ($previousWasOption) {
+                $previousWasOption = false;
+
+                continue;
+            }
+
+            $unsupported[] = $option;
+
+            continue;
+        }
+
+        $previousWasOption = ! str_contains($option, '=');
+    }
 
     if (! empty($unsupported)) {
         fwrite(STDERR, 'Composer dependencies are not installed. Unsupported migrate arguments: ' . implode(', ', $unsupported) . "\n");
