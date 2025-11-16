@@ -2,7 +2,16 @@
     "name": "hrassess/backend",
     "type": "project",
     "require": {
-        "php": "^8.1"
+        "php": "^8.2",
+        "ext-bcmath": "*",
+        "ext-ctype": "*",
+        "ext-fileinfo": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pdo_mysql": "*",
+        "ext-xml": "*",
+        "ext-zip": "*"
     },
     "autoload": {
         "files": [
