@@ -58,6 +58,30 @@ function handleWithoutLaravel(array $argv): int
         return runOfflineMigrations($argv);
     }
 
+    if ($command === 'db:seed' || ($command === 'db' && ($argv[0] ?? null) === 'seed')) {
+        if ($command === 'db') {
+            array_shift($argv);
+        }
+
+        return runOfflineSeeding($argv);
+    }
+
+    if ($command === 'config:cache' || ($command === 'config' && ($argv[0] ?? null) === 'cache')) {
+        if ($command === 'config') {
+            array_shift($argv);
+        }
+
+        return runOfflineOptimization('config', $argv);
+    }
+
+    if ($command === 'route:cache' || ($command === 'route' && ($argv[0] ?? null) === 'cache')) {
+        if ($command === 'route') {
+            array_shift($argv);
+        }
+
+        return runOfflineOptimization('route', $argv);
+    }
+
     fwrite(STDERR, "Composer dependencies are not installed. Unsupported command.\n");
 
     return 1;
@@ -159,4 +183,69 @@ function runOfflineMigrations(array $options): int
     fwrite(STDOUT, "Offline database is already migrated. No actions were required.\n");
 
     return 0;
+}
+
+function runOfflineSeeding(array $options): int
+{
+    [$unsupported, $flags] = partitionUnsupportedOptions($options);
+
+    if (! empty($unsupported)) {
+        fwrite(STDERR, 'Composer dependencies are not installed. Unsupported db:seed arguments: ' . implode(', ', $unsupported) . "\n");
+
+        return 1;
+    }
+
+    $message = 'Offline database seeding is not required. No actions were performed.';
+
+    if (in_array('--force', $flags, true)) {
+        $message .= ' (Force flag ignored.)';
+    }
+
+    fwrite(STDOUT, $message . "\n");
+
+    return 0;
+}
+
+function runOfflineOptimization(string $type, array $options): int
+{
+    [$unsupported] = partitionUnsupportedOptions($options);
+
+    if (! empty($unsupported)) {
+        fwrite(STDERR, sprintf(
+            'Composer dependencies are not installed. Unsupported %s:cache arguments: %s' . "\n",
+            $type,
+            implode(', ', $unsupported)
+        ));
+
+        return 1;
+    }
+
+    $target = $type === 'config' ? 'Configuration' : 'Route definitions';
+    fwrite(STDOUT, sprintf('%s cache is already optimized for the offline backend.%s', $target, "\n"));
+
+    return 0;
+}
+
+/**
+ * @return array{0: array<int, string>, 1: array<int, string>}
+ */
+function partitionUnsupportedOptions(array $options): array
+{
+    $unsupported = [];
+    $flags = [];
+
+    foreach ($options as $option) {
+        if ($option === '--') {
+            continue;
+        }
+
+        if (str_starts_with((string) $option, '--')) {
+            $flags[] = $option;
+            continue;
+        }
+
+        $unsupported[] = $option;
+    }
+
+    return [$unsupported, $flags];
 }
